@@ -1,0 +1,18 @@
+Open Package Manager Console:
+	1. dotnet new tool-manifest
+	2. dotnet tool install --local Mapster.Tool --version 8.3.0
+
+Edit csproj, add this line:
+
+	<ItemGroup>
+		<Generated Include="**\*.g.cs" />
+	</ItemGroup>
+	<Target Name="CleanGenerated">
+		<Delete Files="@(Generated)" />
+	</Target>
+	<Target Name="Mapster" AfterTargets="AfterBuild">
+		<Exec WorkingDirectory="$(ProjectDir)" Command="dotnet tool restore" />
+		<Exec WorkingDirectory="$(ProjectDir)" Command="dotnet mapster model -a $(TargetDir)$(ProjectName).dll -n Sample.CodeGen.Models -o Models -r" />
+		<Exec WorkingDirectory="$(ProjectDir)" Command="dotnet mapster extension -a $(TargetDir)$(ProjectName).dll -n Sample.CodeGen.Models -o Models" />
+		<Exec WorkingDirectory="$(ProjectDir)" Command="dotnet mapster mapper -a $(TargetDir)$(ProjectName).dll -n Sample.CodeGen.Mappers -o Mappers" />
+	</Target>
